@@ -1,7 +1,11 @@
-function[data, xtrain, ytrain] = train(name)
+function[beta,  xtrain, ytrain, samples, features] = train(name)
     data = load(name);
     xtrain = data.Xtrain;
     ytrain = data.ytrain;
+    x_norm = normalize(xtrain);
+    [samples, features] = size(x_norm);
+    beta = zeros(features,1);
+    beta = grad_descent(beta, 1500, x_norm, ytrain)
 endfunction
 
 function[n] = normalize(mat) 
@@ -33,5 +37,12 @@ function[n] = binarize_norm(mat)
                 n(i,j) = 0;
             endif
         endfor
+    endfor
+endfunction
+
+function[beta] = grad_descent(b, iter, x, y, rho=0.5,lambda=0.0)
+    beta = b;
+    for i = 1:iter
+        beta = beta + rho*(x'*(y - arrayfun(@(x) 1/x,(1+exp(-x*b)))) + lambda*beta);
     endfor
 endfunction
